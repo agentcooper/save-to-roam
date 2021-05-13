@@ -15,20 +15,35 @@ body {
 
 #text-input,
 #tag-input,
-#save-button {
+#save-button,
+#template-function-input,
+#details,
+#reset-button,
+#graph-url-input {
   display: block;
   width: 100%;
   /* border: 0; */
   margin-bottom: 1em;
 }
 
+#details {
+  font-size: smaller;
+}
+
 #status {
   font-size: small;
 }
 
+#template-function-input {
+  margin: 0;
+  padding: 0;
+  margin-top: 0.5em;
+  font-family: monospace;
+}
+
 #fieldset {
-    margin: 0;
-    padding: 0;
+  margin: 0;
+  padding: 0;
   border: 0;
 }
 

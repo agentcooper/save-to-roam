@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width; initial-scale=1.0;" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="popup.css" />
     <script type="module" src="popup.js"></script>
   </head>
@@ -13,6 +13,23 @@
         <input id="tag-input" type="text" placeholder="Tag" />
         <input id="save-button" type="submit" value="Save to Roam" />
       </fieldset>
+      <details id="details">
+        <summary>Settings</summary>
+        <div>
+          <input
+            style="margin-top: 1em"
+            id="graph-url-input"
+            type="text"
+            placeholder="Graph url, e.g. roamresearch.com/#/app/MY_GRAPH"
+          />
+          <textarea
+            id="template-function-input"
+            placeholder="Template function"
+            rows="13"
+          ></textarea>
+          <button id="reset-button">Reset</button>
+        </div>
+      </details>
       <svg
         style="display: none"
         id="loading"

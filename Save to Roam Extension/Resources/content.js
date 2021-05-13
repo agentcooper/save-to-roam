@@ -1,11 +1,17 @@
 /**
+ * Run the code in the page context to get access to the global variables.
  *
- * @param {() => void} code
+ * @param {{ code: () => void, prefix: string }} options
  * @param  {...unknown} args
  */
-function run(code, ...args) {
+function run({ code, prefix }, ...args) {
   const actualCode =
-    "(" + code + ")(" + args.map((arg) => JSON.stringify(arg)).join(",") + ");";
+    prefix +
+    "\n\n(" +
+    code +
+    ")(" +
+    args.map((arg) => JSON.stringify(arg)).join(",") +
+    ");";
   const script = document.createElement("script");
   script.textContent = actualCode;
   (document.head || document.documentElement).appendChild(script);
@@ -36,73 +42,84 @@ waitFor(".roam-body-main").then(() => {
   browser.runtime.sendMessage({ type: "roam-ready" });
 });
 
-browser.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
-  if (request.type === "ping") {
-    sendResponse("pong");
-    return;
-  }
-
-  if (request.type === "add-block") {
-    console.log("Ready!");
-
+browser.runtime.onMessage.addListener(
+  async (
+    /** @type {{ type: string; title: string; url: string; text: string; tag: string; templateFunction: string }} */ request,
+    /** @type {any} */ sender,
+    /** @type {(arg0: string) => void} */ sendResponse
+  ) => {
+    if (request.type !== "add-block") {
+      return;
+    }
     window.addEventListener(
       "page-res",
-      function (evt) {
-        // @ts-ignore
-        sendResponse(evt.detail.success ? "Done" : "Error");
+      /**
+       * @param {CustomEvent} event
+       */
+      (event) => {
+        sendResponse(event.detail.success ? "Done" : "Error");
       },
       {
         once: true,
       }
     );
-    run(
-      (
-        /** @type {string} */ title,
-        /** @type {string} */ url,
-        /** @type {string} */ text,
-        /** @type {string} */ tag
-      ) => {
-        try {
-          /**
-           * @param {Record<string, unknown>} params
-           */
-          function dispatch(params) {
-            window.dispatchEvent(
-              new CustomEvent("page-res", { detail: params })
-            );
-          }
+    try {
+      run(
+        {
+          prefix: request.templateFunction,
+          code: (
+            /** @type {string} */ title,
+            /** @type {string} */ url,
+            /** @type {string} */ text,
+            /** @type {string} */ tag
+          ) => {
+            try {
+              /**
+               * @param {Record<string, unknown>} params
+               */
+              function dispatch(params) {
+                window.dispatchEvent(
+                  new CustomEvent("page-res", { detail: params })
+                );
+              }
 
-          function dailyNoteUID() {
-            const isoString = new Date().toISOString();
+              function dailyNoteUID() {
+                const isoString = new Date().toISOString();
+                const [yyyy, mm, dd] = isoString.slice(0, 10).split("-");
+                return [mm, Number(dd), yyyy].join("-");
+              }
 
-            const [yyyy, mm, dd] = isoString.slice(0, 10).split("-");
-            console.log(isoString);
+              function useTemplate() {
+                try {
+                  return getMarkdown(title, url, text, tag);
+                } catch (e) {
+                  console.error(e);
+                  return "⚠️ [Save to Roam] Error in a template function, please check your code.";
+                }
+              }
 
-            return [mm, Number(dd), yyyy].join("-");
-          }
+              const block = {
+                block: { string: useTemplate() },
+                location: { "parent-uid": dailyNoteUID(), order: 0 },
+              };
+              console.log("[Save to Roam] Creating block", block);
 
-          function getMarkdown(title, url, text, tag) {
-            const link = `[${title}](${url})`;
-            return [link, text, tag ? `#[[${tag}]]` : ""].join(" ");
-          }
-
-          const block = {
-            block: { string: getMarkdown(title, url, text, tag) },
-            location: { "parent-uid": dailyNoteUID(), order: 0 },
-          };
-          console.log("[Save to Roam] Creating block", block);
-
-          // @ts-ignore
-          const createResult = window.roamAlphaAPI.createBlock(block);
-          dispatch({ success: createResult });
-        } catch (e) {
-          dispatch({ success: false });
-        }
-      },
-      request.title,
-      request.url,
-      request.text,
-      request.tag
-    );
+              // @ts-ignore
+              const createResult = window.roamAlphaAPI.createBlock(block);
+              dispatch({ success: createResult });
+            } catch (e) {
+              dispatch({ success: false });
+            }
+          },
+        },
+        request.title,
+        request.url,
+        request.text,
+        request.tag
+      );
+    } catch (e) {
+      console.error(e);
+      sendResponse("Error");
+    }
   }
-});
+);
