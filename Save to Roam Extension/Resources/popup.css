@@ -2,12 +2,34 @@
   color-scheme: light dark;
 }
 
-body {
-  width: 100px;
-  padding: 10px;
+* {
+  box-sizing: border-box;
+}
 
+body {
+  width: 150px;
+  padding: 1em;
   font-family: system-ui;
   text-align: center;
+}
+
+#text-input,
+#tag-input,
+#save-button {
+  display: block;
+  width: 100%;
+  /* border: 0; */
+  margin-bottom: 1em;
+}
+
+#status {
+  font-size: small;
+}
+
+#fieldset {
+    margin: 0;
+    padding: 0;
+  border: 0;
 }
 
 @media (prefers-color-scheme: dark) {

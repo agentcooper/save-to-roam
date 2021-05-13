@@ -1,7 +1,7 @@
 /**
  *
  * @param {() => void} code
- * @param  {...any} args
+ * @param  {...unknown} args
  */
 function run(code, ...args) {
   const actualCode =
@@ -15,7 +15,7 @@ function run(code, ...args) {
 /**
  *
  * @param {string} selector
- * @returns Promise<any>
+ * @returns Promise<void>
  */
 function waitFor(selector) {
   return new Promise((resolve) => {
@@ -49,7 +49,7 @@ browser.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
       "page-res",
       function (evt) {
         // @ts-ignore
-        sendResponse(evt.detail.success ? "OK" : "Not OK");
+        sendResponse(evt.detail.success ? "Done" : "Error");
       },
       {
         once: true,
@@ -57,11 +57,15 @@ browser.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
     );
     run(
       (
-        /** @type {any} */ title,
-        /** @type {any} */ url,
-        /** @type {any} */ text
+        /** @type {string} */ title,
+        /** @type {string} */ url,
+        /** @type {string} */ text,
+        /** @type {string} */ tag
       ) => {
         try {
+          /**
+           * @param {Record<string, unknown>} params
+           */
           function dispatch(params) {
             window.dispatchEvent(
               new CustomEvent("page-res", { detail: params })
@@ -69,17 +73,27 @@ browser.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
           }
 
           function dailyNoteUID() {
-            const [yyyy, mm, dd] = new Date()
-              .toISOString()
-              .slice(0, 10)
-              .split("-");
-            return [mm, Number(dd) + 1, yyyy].join("-");
+            const isoString = new Date().toISOString();
+
+            const [yyyy, mm, dd] = isoString.slice(0, 10).split("-");
+            console.log(isoString);
+
+            return [mm, Number(dd), yyyy].join("-");
           }
-          // @ts-ignore
-          const createResult = window.roamAlphaAPI.createBlock({
-            block: { string: `[${title}](${url}) ${text}` },
+
+          function getMarkdown(title, url, text, tag) {
+            const link = `[${title}](${url})`;
+            return [link, text, tag ? `#[[${tag}]]` : ""].join(" ");
+          }
+
+          const block = {
+            block: { string: getMarkdown(title, url, text, tag) },
             location: { "parent-uid": dailyNoteUID(), order: 0 },
-          });
+          };
+          console.log("[Save to Roam] Creating block", block);
+
+          // @ts-ignore
+          const createResult = window.roamAlphaAPI.createBlock(block);
           dispatch({ success: createResult });
         } catch (e) {
           dispatch({ success: false });
@@ -87,7 +101,8 @@ browser.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
       },
       request.title,
       request.url,
-      request.text || "?"
+      request.text,
+      request.tag
     );
   }
 });

@@ -14,6 +14,10 @@
     "512": "images/icon-512.png"
   },
 
+  "options_ui": {
+    "page": "options.html"
+  },
+
   "content_scripts": [
     {
       "js": ["content.js"],

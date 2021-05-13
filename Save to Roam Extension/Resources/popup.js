@@ -25,36 +25,70 @@ async function findOrCreateTab(url) {
   });
 
   const existingTab = existingTabs.find(
-    (/** @type {{ url: string | any[]; }} */ tab) => tab.url.length > 0
+    (/** @type {{ url: string; }} */ tab) => tab.url.length > 0
   );
   if (existingTab) {
     return [existingTab, false];
   }
 
+  const currentWindow = await browser.windows.getCurrent();
+
   const newWindow = await browser.windows.create({
     url,
     focused: false,
-    height: 100,
-    width: 100,
+    left: currentWindow.left,
+    top: currentWindow.top,
+    height: currentWindow.height,
+    width: currentWindow.width,
   });
 
   return [newWindow.tabs[0], true];
 }
 
 /**
- * @param {{ (request: any, sender: any, sendResponse: any): Promise<void>; (arg0: any): void; }} handler
+ * @param {(request: any, sender: any, sendResponse: any) => Promise<void>} handler
  */
 function listenOnce(handler) {
-  const _handler = (/** @type {any[]} */ ...args) => {
+  const _handler = (/** @type {Parameters<typeof handler>} */ ...args) => {
     browser.runtime.onMessage.removeListener(_handler);
-    // @ts-ignore
     handler(...args);
   };
 
   browser.runtime.onMessage.addListener(_handler);
 }
 
-document.getElementById("btn").onclick = async () => {
+function getText() {
+  const input = /** @type {HTMLInputElement} */ (
+    document.getElementById("text-input")
+  );
+  return input.value;
+}
+
+function getTag() {
+  const input = /** @type {HTMLInputElement} */ (
+    document.getElementById("tag-input")
+  );
+  return input.value;
+}
+
+function toggleForm(disabled) {
+  document.getElementById("loading").style.display = disabled
+    ? "inline"
+    : "none";
+
+  const fieldset = /** @type {HTMLFieldSetElement} */ (
+    document.getElementById("fieldset")
+  );
+
+  fieldset.disabled = disabled;
+}
+
+document.getElementById("form").onsubmit = async (event) => {
+  event.preventDefault();
+
+  setStatus("");
+  toggleForm(true);
+
   const tabs = await browser.tabs.query({ active: true, currentWindow: true });
   const currentTab = tabs[0];
 
@@ -63,8 +97,6 @@ document.getElementById("btn").onclick = async () => {
   );
 
   if (isNew) {
-    setStatus("Launching Roam...");
-
     listenOnce(
       async (
         /** @type {{ type: string; }} */ request,
@@ -77,6 +109,7 @@ document.getElementById("btn").onclick = async () => {
       }
     );
   } else {
+    await delay(200);
     send();
   }
 
@@ -85,8 +118,10 @@ document.getElementById("btn").onclick = async () => {
       type: "add-block",
       url: currentTab.url,
       title: currentTab.title,
-      text: "bla",
+      text: getText(),
+      tag: getTag(),
     });
+    toggleForm(false);
     setStatus(result);
   }
 };
