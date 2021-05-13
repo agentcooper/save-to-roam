@@ -7,11 +7,11 @@
   "version": "1.0",
 
   "icons": {
-    "48": "images/icon-48.png",
-    "96": "images/icon-96.png",
-    "128": "images/icon-128.png",
-    "256": "images/icon-256.png",
-    "512": "images/icon-512.png"
+    "48": "images/icon.png",
+    "96": "images/icon.png",
+    "128": "images/icon.png",
+    "256": "images/icon.png",
+    "512": "images/icon.png"
   },
 
   "options_ui": {
@@ -28,10 +28,10 @@
   "browser_action": {
     "default_popup": "popup.html",
     "default_icon": {
-      "16": "images/toolbar-icon-16.png",
-      "19": "images/toolbar-icon-19.png",
-      "32": "images/toolbar-icon-32.png",
-      "38": "images/toolbar-icon-38.png"
+      "16": "images/icon.png",
+      "19": "images/icon.png",
+      "32": "images/icon.png",
+      "38": "images/icon.png"
     }
   },
 
