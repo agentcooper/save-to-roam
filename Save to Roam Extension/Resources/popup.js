@@ -163,7 +163,6 @@ const settings = {
 
   async fetchKey(name, otherwise) {
     const results = await browser.storage.local.get(name);
-    console.log({ name, results });
     if (results[name]) {
       return results[name];
     }
@@ -171,12 +170,20 @@ const settings = {
   },
 
   async load() {
+    browser.tabs.executeScript(
+      {
+        code: "window.getSelection().toString();",
+      },
+      (selection) => {
+        form.getInput("text-input").value = selection[0] || "";
+      }
+    );
+
     form.getInput("template-function-input").value = await this.fetchKey(
       this.keys.templateFunction,
       this.getDefaultTemplateFunction()
     );
 
-    console.log("load");
     form.getInput("graph-url-input").value = await this.fetchKey(
       this.keys.graphUrl,
       ""
