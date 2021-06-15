@@ -84,9 +84,12 @@ browser.runtime.onMessage.addListener(
               }
 
               function dailyNoteUID() {
-                const isoString = new Date().toISOString();
-                const [yyyy, mm, dd] = isoString.slice(0, 10).split("-");
-                return [mm, Number(dd), yyyy].join("-");
+                const now = new Date();
+                return [
+                  String(now.getMonth() + 1).padStart(2, "0"),
+                  String(now.getDate()).padStart(2, "0"),
+                  now.getFullYear(),
+                ].join("-");
               }
 
               function useTemplate() {
