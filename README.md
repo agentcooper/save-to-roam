@@ -12,7 +12,7 @@ This project is in beta stage and it is not published in the App Store yet.
 ## Run
 
 1. Clone the project.
-2. Open with Xcode, run the project.
+2. Open with [Xcode](https://apps.apple.com/us/app/xcode/id497799835), run the project.
 3. Go to Safari, from the top menu > `Preferences` > `Advanced` > `Show Develop menu in menu bar`.
 4. From the top menu > `Develop` > `Allow Unsigned Extensions`.
 5. Enable the extension in `Preferences` > `Extensions`.
