@@ -17,4 +17,4 @@ This project is in beta stage and it is not published in the App Store yet.
 4. From the top menu > `Develop` > `Allow Unsigned Extensions`.
 5. Enable the extension in `Preferences` > `Extensions`.
 
-Unfortunately you will need to do step 5 every time you open Safari.
+You will need to do step 5 every time you open Safari.
