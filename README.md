@@ -17,6 +17,8 @@ This project is in beta stage and it is not published in the App Store yet.
 4. From the top menu > `Develop` > `Allow Unsigned Extensions`.
 5. Enable the extension in `Preferences` > `Extensions`.
 
+If you save and see the loading indicator hanging, check if there is a pending permission request in the other Safari window with Roam.
+
 You will need to do step 4 every time you open Safari.
 
 ## Development
