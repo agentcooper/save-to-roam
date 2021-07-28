@@ -27,4 +27,8 @@ You will need to do step 4 every time you open Safari.
 2. Open with [Xcode](https://apps.apple.com/us/app/xcode/id497799835), run the project.
 3. Follow step 3 to 5 from the list above.
 
+## Privacy policy
+
+Save to Roam does not collect or retain any data from users.
+
 
