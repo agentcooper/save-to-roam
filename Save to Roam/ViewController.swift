@@ -10,7 +10,7 @@ import SafariServices.SFSafariApplication
 import SafariServices.SFSafariExtensionManager
 
 let appName = "Save to Roam"
-let extensionBundleIdentifier = "agentcooper.Save-to-Roam.Extension"
+let extensionBundleIdentifier = "agentcooper.save-to-roam.extension"
 
 class ViewController: NSViewController {
 
