@@ -21,6 +21,17 @@ If you save and see the loading indicator hanging, check if there is a pending p
 
 You will need to do step 4 every time you open Safari.
 
+## How to use
+
+1. Make sure you're logged in to [Roam Research](http://roamresearch.com) in Safari.
+2. Go to some page you want to save (e.g. https://en.wikipedia.org/wiki/Memex) and click the extension icon.
+3. If you're using the extension for the first time, click on "Settings" and fill the "Graph url" input (it should look like `https://roamresearch.com/#/app/YOUR-GRAPH-NAME`).
+4. Click "Save".
+5. The spinner takes some time if the extension can't find the open tab with Roam Research. In that case it will open it in the foreground window. Otherwise, an existing tab will be used.
+6. Verify your highlight by opening your Daily Notes in Roam Research.
+
+If you see the warning icon on the extension icon, you need to click it and allow the extension to access Roam Research website. If you don't see the warning icon, but the spinner is taking to long, please check other windows in Safari (Top Menu > Window), the warning icon might appear there.
+
 ## Development
 
 1. Clone the project.
