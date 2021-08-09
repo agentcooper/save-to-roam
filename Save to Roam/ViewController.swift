@@ -21,6 +21,7 @@ class ViewController: NSViewController {
         self.appNameLabel.stringValue = appName
         SFSafariExtensionManager.getStateOfSafariExtension(withIdentifier: extensionBundleIdentifier) { (state, error) in
             guard let state = state, error == nil else {
+                self.appNameLabel.stringValue = error.debugDescription
                 // Insert code to inform the user that something went wrong.
                 return
             }
@@ -38,6 +39,7 @@ class ViewController: NSViewController {
     @IBAction func openSafariExtensionPreferences(_ sender: AnyObject?) {
         SFSafariApplication.showPreferencesForExtension(withIdentifier: extensionBundleIdentifier) { error in
             guard error == nil else {
+                self.appNameLabel.stringValue = error.debugDescription
                 // Insert code to inform the user that something went wrong.
                 return
             }
