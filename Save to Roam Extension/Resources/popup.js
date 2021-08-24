@@ -1,3 +1,5 @@
+const LISTEN_TIMEOUT = 20000;
+
 function getMarkdown(title, url, text, tag) {
   let markdown = `[${title}](${url})`;
   if (text) markdown += ` ${text}`;
@@ -58,6 +60,13 @@ const form = {
     fieldset.disabled = isDisabled;
   },
 
+  setError(message) {
+    console.error(`[Save to Roam] Showing error`, message);
+    this.setStatus(message);
+    this.toggleLoading(false);
+    this.disable(false);
+  },
+
   /**
    * @param {string} message
    */
@@ -108,35 +117,44 @@ const form = {
         this.getGraphUrl()
       );
 
-      const send = async () => {
-        const result = await browser.tabs.sendMessage(roamTab.id, {
+      const callRoamAPI = async () => {
+        const message = {
           type: "add-block",
           url: currentTab.url,
           title: currentTab.title,
           text: form.getText(),
           tag: form.getTag(),
           templateFunction: form.getTemplateFunction(),
-        });
+        };
+        console.log(`[Save to Roam] Calling Roam page API`, message);
+        const result = await browser.tabs.sendMessage(roamTab.id, message);
+        console.log(`[Save to Roam] Got result from Roam page API`, result);
         this.setStatus(result);
         this.toggleLoading(false);
         this.disable(false);
       };
 
       if (isNew) {
-        listenOnce(
-          async (
-            /** @type {{ type: string; }} */ request,
-            /** @type {any} */ sender,
-            /** @type {any} */ sendResponse
-          ) => {
-            if (request.type === "roam-ready") {
-              send();
-            }
-          }
+        console.log(
+          `[Save to Roam] New tab, waiting for the message from the Roam tab`,
+          roamTab
         );
+        listenOnce((/** @type {{ type: string; success: true }} */ request) => {
+          console.log(`[Save to Roam] Got request`, request);
+
+          // @ts-ignore
+          if (request.error) {
+            // @ts-ignore
+            this.setError(request.error);
+            return;
+          }
+
+          callRoamAPI();
+        }, LISTEN_TIMEOUT);
       } else {
+        console.log(`[Save to Roam] Existing tab`, roamTab);
         await delay(200);
-        send();
+        callRoamAPI();
       }
     };
 
@@ -170,14 +188,18 @@ const settings = {
   },
 
   async load() {
-    browser.tabs.executeScript(
-      {
-        code: "window.getSelection().toString();",
-      },
-      (selection) => {
-        form.getInput("text-input").value = selection[0] || "";
-      }
-    );
+    try {
+      browser.tabs.executeScript(
+        {
+          code: "window.getSelection().toString();",
+        },
+        (selection) => {
+          form.getInput("text-input").value = selection[0] || "";
+        }
+      );
+    } catch (e) {
+      console.error(`[Save to Roam] Could not execute script`, e);
+    }
 
     form.getInput("template-function-input").value = await this.fetchKey(
       this.keys.templateFunction,
@@ -202,7 +224,7 @@ const settings = {
     var details = document.querySelector("details");
     details.addEventListener("toggle", () => {
       const isOpen = details.hasAttribute("open");
-      document.querySelector("body").style.width = isOpen ? "500px" : "150px";
+      document.querySelector("body").style.width = isOpen ? "500px" : "180px";
     });
 
     document.getElementById("reset-button").onclick = async (event) => {
@@ -239,7 +261,7 @@ ${getMarkdown.toString()}
  * @param {number} ms
  */
 function delay(ms) {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     return setTimeout(() => {
       resolve();
     }, ms);
@@ -247,15 +269,33 @@ function delay(ms) {
 }
 
 /**
- * @param {(request: any, sender: any, sendResponse: any) => Promise<void>} handler
+ * @param {(request: any, sender: any, sendResponse: any) => void} handler
+ * @param {number} timeout
  */
-function listenOnce(handler) {
-  const _handler = (/** @type {Parameters<typeof handler>} */ ...args) => {
+function listenOnce(handler, timeout) {
+  let timeoutId;
+
+  function removeListener() {
+    clearTimeout(timeoutId);
     browser.runtime.onMessage.removeListener(_handler);
+  }
+
+  function _handler(/** @type {Parameters<typeof handler>} */ ...args) {
+    console.log(`[Save to Roam] Got message`, args);
     handler(...args);
-  };
+    removeListener();
+  }
 
   browser.runtime.onMessage.addListener(_handler);
+
+  timeoutId = setTimeout(() => {
+    removeListener();
+    handler({
+      type: "timeout",
+      success: false,
+      error: `❌ Error: didn't get any messages from the Roam tab. Please check extension permissions. Make sure roamresearch.com is set to Allow. Then restart Safari and try again.`,
+    });
+  }, timeout);
 }
 
 form.init();

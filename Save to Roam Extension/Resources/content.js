@@ -21,11 +21,19 @@ function run({ code, prefix }, ...args) {
 /**
  *
  * @param {string} selector
+ * @param {number} timeout
  * @returns Promise<void>
  */
-function waitFor(selector) {
-  return new Promise((resolve) => {
+function waitFor(selector, timeout) {
+  return new Promise((resolve, reject) => {
+    const timeoutId = setTimeout(() => {
+      reject(
+        `couldn't find selector '${selector}', please verify that you're logged in to Roam Research in Safari`
+      );
+    }, timeout);
+
     (function tick() {
+      console.log(`[Save to Roam] Tick`);
       const element = document.querySelector(selector);
 
       if (!element) {
@@ -33,14 +41,30 @@ function waitFor(selector) {
         return;
       }
 
+      clearTimeout(timeoutId);
       resolve();
     })();
   });
 }
 
-waitFor(".roam-body-main").then(() => {
-  browser.runtime.sendMessage({ type: "roam-ready" });
-});
+const selector = ".roam-body-main";
+console.log(`[Save to Roam] Waiting for selector '${selector}'`);
+waitFor(selector, 15000).then(
+  () => {
+    console.log(
+      `[Save to Roam] Found selector '${selector}', sending a message`
+    );
+    browser.runtime.sendMessage({ type: "roam-page", success: true });
+  },
+  (e) => {
+    console.log(`[Save to Roam] Error: ${e}`);
+    browser.runtime.sendMessage({
+      type: "roam-page",
+      success: false,
+      error: `❌ Error: ${e}`,
+    });
+  }
+);
 
 browser.runtime.onMessage.addListener(
   async (
@@ -57,7 +81,9 @@ browser.runtime.onMessage.addListener(
        * @param {CustomEvent} event
        */
       (event) => {
-        sendResponse(event.detail.success ? "Done" : "Error");
+        sendResponse(
+          event.detail.success ? "Done" : `❌ Error: ${event.detail.error}`
+        );
       },
       {
         once: true,
@@ -111,7 +137,7 @@ browser.runtime.onMessage.addListener(
               const createResult = window.roamAlphaAPI.createBlock(block);
               dispatch({ success: createResult });
             } catch (e) {
-              dispatch({ success: false });
+              dispatch({ success: false, error: e });
             }
           },
         },
@@ -122,7 +148,7 @@ browser.runtime.onMessage.addListener(
       );
     } catch (e) {
       console.error(e);
-      sendResponse("Error");
+      sendResponse(`❌ Error: ${e}`);
     }
   }
 );
