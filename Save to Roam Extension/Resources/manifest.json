@@ -27,5 +27,5 @@
     }
   },
 
-  "permissions": ["storage", "activeTab"]
+  "permissions": ["storage", "activeTab", "*://*.roamresearch.com/*"]
 }
