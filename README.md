@@ -12,7 +12,7 @@ This project is in beta stage and it is not published in the App Store yet.
 ## Install and run
 
 1. Download the [latest release](https://github.com/agentcooper/save-to-roam/releases).
-2. Unpack, move `Save to Roam.app` to Applications, open.
+2. Move `Save to Roam.app` to Applications, then open.
 3. Go to Safari, from the top menu > `Preferences` > `Advanced` > `Show Develop menu in menu bar`.
 4. From the top menu > `Develop` > `Allow Unsigned Extensions`.
 5. Enable the extension in `Preferences` > `Extensions`.
