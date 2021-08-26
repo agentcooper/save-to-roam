@@ -11,7 +11,7 @@ Demo:
 
 ## Install and run
 
-Install [Save to Roam from macOS App Store](https://apps.apple.com/nl/app/save-to-roam/id1578763303).
+Install [Save to Roam from macOS App Store](https://apps.apple.com/us/app/save-to-roam/id1578763303).
 
 ## Install and run (without App Store) 
 
