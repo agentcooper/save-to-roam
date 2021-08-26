@@ -1,4 +1,6 @@
-# Save to Roam
+☕️ [Buy me a coffee](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=SC4D2NS8G2JJ8&source=url)
+
+# Save to Roam for Safari
 Safari extension for [Roam Research](https://roamresearch.com).
 
 The extension opens the Roam Research (or reuse an existing window) in the background and communicates with it using the JavaScript API.
@@ -7,9 +9,11 @@ Demo:
 
 ![Demo video](https://user-images.githubusercontent.com/794591/122137950-10cf8480-ce46-11eb-89e8-a469308b54af.gif)
 
-This project is in beta stage and it is not published in the App Store yet.
-
 ## Install and run
+
+Install [Save to Roam from macOS App Store](https://apps.apple.com/nl/app/save-to-roam/id1578763303).
+
+## Install and run (without App Store) 
 
 1. Download the [latest release](https://github.com/agentcooper/save-to-roam/releases).
 2. Move `Save to Roam.app` to Applications, then open.
@@ -19,7 +23,7 @@ This project is in beta stage and it is not published in the App Store yet.
 
 If you save and see the loading indicator hanging, check if there is a pending permission request in the other Safari window with Roam.
 
-You will need to do step 4 every time you open Safari.
+⚠️ You will need to do step 4 every time you open Safari (this is a limitation for extensions installed not from the App Store).
 
 ## How to use
 
@@ -37,6 +41,13 @@ If you see the warning icon on the extension icon, you need to click it and allo
 1. Clone the project.
 2. Open with [Xcode](https://apps.apple.com/us/app/xcode/id497799835), run the project.
 3. Follow step 3 to 5 from the list above.
+
+## Troubleshooting
+
+If you see `❌ Error: didn't get any messages from the Roam tab. Please check extension permissions. Make sure roamresearch.com is set to Allow. Then restart Safari and try again.`, then:
+
+1. Check **all** Safari windows for the warning sign on top of the extension icon. Safari may be asking for permissions in a different window.
+2. Make sure roamresearch.com is set to **Allow** in extension settings.
 
 ## Privacy policy
 
